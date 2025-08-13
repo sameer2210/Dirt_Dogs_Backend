@@ -1,0 +1,51 @@
+CLIENT WEBSITE - https://dirtdogsexcavating.com/
+
+
+# Dirt Dogs Backend
+
+This is the backend for the Dirt Dogs project. Below is an overview of the folder structure and the purpose of each directory and file.
+
+## Folder Structure
+
+```
+├── package.json         # Project dependencies and scripts
+├── Readme               # Project documentation
+├── src/                 # Source code
+│   ├── app.js           # Main application file
+│   ├── server.js        # Server setup and entry point
+│   ├── config/          # Configuration files
+│   │   └── db.js        # Database configuration
+│   └── models/          # Database models
+├── uploads/             # Uploaded images and media files
+│   └── ...              # Various image and video files
+```
+
+## Description
+
+- **package.json**: Contains project metadata, dependencies, and scripts for running the backend.
+- **Readme**: This documentation file.
+- **src/**: Main source code for the backend application.
+  - **app.js**: The main application logic.
+  - **server.js**: Entry point for starting the server.
+  - **config/**: Configuration files, such as database setup.
+  - **models/**: Contains database models.
+- **uploads/**: Stores uploaded images and media files used by the application.
+
+## Getting Started
+
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+2. Start the server:
+   ```bash
+   npm start
+   ```
+
+## Contributing
+
+Feel free to fork the repository and submit pull requests.
+
+## License
+
+Specify your license here.
