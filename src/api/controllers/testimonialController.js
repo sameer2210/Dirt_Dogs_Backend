@@ -161,7 +161,7 @@ export const deleteTestimonial = asyncHandler(async (req, res) => {
     });
   }
 
-  const testimonial = await testimonialId.findById(testimonialId);
+  const testimonial = await testimonialModel.findById(testimonialId);
 
   if (!testimonial) {
     return res.status(404).json({

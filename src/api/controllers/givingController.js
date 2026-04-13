@@ -62,7 +62,7 @@ export const updateGivingBack = asyncHandler(async (req, res) => {
     return res.status(400).json({ success: false, message: "givingBackId is required" });
   }
 
-  const givingBack = await givingBackId.findById(givingBackId);
+  const givingBack = await givingModel.findById(givingBackId);
   if (!givingBack) {
     return res.status(404).json({ success: false, message: "GivingBack not found" });
   }

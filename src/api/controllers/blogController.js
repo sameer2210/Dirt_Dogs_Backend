@@ -1,5 +1,5 @@
 import asyncHandler from "../../utils/asyncHandler.js";
-import blogMoel from "../../models/blogModel.js";
+import blogModel from "../../models/blogModel.js";
 import { deleteFileFromUploads } from "../middleware/multer.js";
 import { normalizePath } from "../../utils/normalizePath.js";
 
@@ -12,7 +12,7 @@ export const createBlog = asyncHandler(async (req, res) => {
     ? req.files.image.map((file) => normalizePath(file))
     : [];
 
-  const blog = await blogMoel.create({
+  const blog = await blogModel.create({
     title,
     description,
     image: images,
@@ -38,7 +38,7 @@ export const updateBlog = asyncHandler(async (req, res) => {
   }
 
  
-  const blog = await blogMoel.findById(blogId);
+  const blog = await blogModel.findById(blogId);
   if (!blog) {
     return res.status(404).json({ success: false, message: "Blog not found" });
   }
@@ -114,7 +114,7 @@ export const getBlogById = asyncHandler(async (req, res) => {
     return res.status(400).json({ success: false, message: "blogId is required" });
   }
 
-  const blog = await blogMoel.findById(blogId);
+  const blog = await blogModel.findById(blogId);
   if (!blog) {
     return res.status(404).json({ success: false, message: "Blog not found" });
   }
@@ -140,10 +140,10 @@ export const getBlogByFilter = asyncHandler(async (req, res) => {
     ];
   }
 
-  const total = await blogMoel.countDocuments(query);
+  const total = await blogModel.countDocuments(query);
   const totalPages = Math.ceil(total / limit);
 
-  const blogs = await blogMoel.find(query)
+  const blogs = await blogModel.find(query)
     .sort({ createdAt: -1 })
     .skip((page - 1) * limit)
     .limit(Number(limit));
@@ -168,7 +168,7 @@ export const deleteBlog = asyncHandler(async (req, res) => {
     return res.status(400).json({ success: false, message: "blogId is required" });
   }
 
-  const blog = await blogMoel.findById(blogId);
+  const blog = await blogModel.findById(blogId);
   if (!blog) {
     return res.status(404).json({ success: false, message: "Blog not found" });
   }

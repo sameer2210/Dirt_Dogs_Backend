@@ -1,6 +1,6 @@
 import adminModel from "../../models/adminModel.js"
 import  jwt from "jsonwebtoken";
-import { compareValue } from "../../utils/hashValue.js";
+import { compareValue, hashValue } from "../../utils/hashValue.js";
 import asyncHandler from "../../utils/asyncHandler.js";
 
 export const adminLogin = asyncHandler(async(req,res)=>{
@@ -8,6 +8,12 @@ export const adminLogin = asyncHandler(async(req,res)=>{
      const {email,password} = req.body;
 
    const adminUser = await adminModel.findOne({email,userType:"Admin"});
+
+     if(!adminUser){
+    return res.status(401).json({
+      success:false,message:"Invalid email or user type"
+    })
+  }
 
   const isMatchPassword = await compareValue(password,adminUser.password);
 

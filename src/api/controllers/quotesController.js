@@ -63,7 +63,7 @@ export const getQuoteById = asyncHandler(async (req, res) => {
     return res.status(400).json({ success: false, message: "quoteId is required" });
   }
 
-  const quote = await Quote.findById(quoteId);
+  const quote = await quotesModel.findById(quoteId);
 
   if (!quote) {
     return res.status(404).json({ success: false, message: "Quote not found" });
