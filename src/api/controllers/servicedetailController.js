@@ -1,6 +1,7 @@
 import asyncHandler from "../../utils/asyncHandler.js";
 import serviceDetailModel from "../../models/servicedetailModel.js";
 import { deleteFileFromUploads } from "../middleware/multer.js";
+import mongoose from "mongoose";
 
 
 export const createServiceDetail = asyncHandler(async (req, res) => {
@@ -108,6 +109,10 @@ export const getServiceDetailById = asyncHandler(async (req, res) => {
 
   if (!serviceDetailId) {
     return res.status(400).json({ success: false, message: "serviceDetailId is required" });
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(serviceDetailId)) {
+    return res.status(400).json({ success: false, message: "Invalid serviceDetailId format" });
   }
 
   const serviceDetail = await serviceDetailModel.findById(serviceDetailId);
