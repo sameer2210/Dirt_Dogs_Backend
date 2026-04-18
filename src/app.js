@@ -28,6 +28,10 @@ import { fileURLToPath } from "url";
 
 const app = express();
 
+const corsOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(",").map((origin) => origin.trim())
+  : ["http://localhost:5173"];
+
 
 
 
@@ -40,7 +44,7 @@ app.use(morgan("tiny"));
 
 app.use(errorMiddleware);
 app.use(cors({
-  origin: "http://localhost:5173",  
+  origin: corsOrigins,  
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true    
 }));

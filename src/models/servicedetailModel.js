@@ -10,6 +10,10 @@ const serviceDetailSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    websiteUrl: {
+      type: String,
+      trim: true,
+    },
     banners: [
       {
         type: String, 

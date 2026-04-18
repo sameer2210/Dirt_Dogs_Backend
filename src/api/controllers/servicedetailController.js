@@ -5,7 +5,7 @@ import mongoose from "mongoose";
 
 
 export const createServiceDetail = asyncHandler(async (req, res) => {
-  const { title, description } = req.body;
+  const { title, description, websiteUrl } = req.body;
 
   const banners = req.files?.banners
     ? req.files.banners.map(file => file.path.replace(/\\/g, "/"))
@@ -24,6 +24,7 @@ export const createServiceDetail = asyncHandler(async (req, res) => {
   const serviceDetail = await serviceDetailModel.create({
     title,
     description,
+    websiteUrl: websiteUrl?.trim() || "",
     banners,
     image,
     video,
@@ -38,7 +39,7 @@ export const createServiceDetail = asyncHandler(async (req, res) => {
 
 
 export const updateServiceDetail = asyncHandler(async (req, res) => {
-  const { serviceDetailId, title, description, bannerIndexes } = req.body;
+  const { serviceDetailId, title, description, websiteUrl, bannerIndexes } = req.body;
 
   if (!serviceDetailId) {
     return res.status(400).json({ success: false, message: "serviceDetailId is required" });
@@ -54,6 +55,9 @@ export const updateServiceDetail = asyncHandler(async (req, res) => {
 
   serviceDetail.title = title ?? serviceDetail.title;
   serviceDetail.description = description ?? serviceDetail.description;
+  if (websiteUrl !== undefined) {
+    serviceDetail.websiteUrl = websiteUrl?.trim() || "";
+  }
 
   
   if (req.files?.banners && req.files.banners.length > 0) {
@@ -214,6 +218,7 @@ export const getServiceDetailByFilter = asyncHandler(async (req, res) => {
     query.$or = [
       { title: { $regex: search, $options: "i" } },
       { description: { $regex: search, $options: "i" } },
+      { websiteUrl: { $regex: search, $options: "i" } },
     ];
   }
 
