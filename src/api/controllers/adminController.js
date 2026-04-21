@@ -23,7 +23,7 @@ export const adminLogin = asyncHandler(async(req,res)=>{
     })
   }
 
-  const token = jwt.sign({id: adminUser._id,userType:adminUser.userType},process.env.JWT_SECRET_KEY,{expiresIn:"16d"})
+  const token = jwt.sign({id: adminUser._id,userType:adminUser.userType},process.env.JWT_SECRET,{expiresIn:"16d"})
 
    adminUser._doc.token = token;
 
@@ -34,7 +34,7 @@ export const adminLogin = asyncHandler(async(req,res)=>{
 export const updateAdminProfile = asyncHandler(async(req,res)=>{
 
     const { name,  password,adminId } = req.body;
-    const image = req.file?.path || null;
+    const image = req.file?.location || req.file?.path || null;
 
     if (!adminId) {
       return res.status(400).json({

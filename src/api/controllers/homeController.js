@@ -88,7 +88,7 @@ export const updateHomePage = asyncHandler(async (req, res) => {
 
   
   if (req.files?.topImage && req.files.topImage.length > 0) {
-    const newImages = req.files.topImage.map((file) => file.path);
+    const newImages = req.files.topImage.map((file) => file.location || file.path);
     let updatedImages = [...home.topImage];
 
     if (topImageIndexesArray.length > 0) {
@@ -120,7 +120,7 @@ export const updateHomePage = asyncHandler(async (req, res) => {
     if (home.homeIcon) {
       await deleteFileFromUploads(home.homeIcon);
     }
-    home.homeIcon = req.files.homeIcon[0].path;
+    home.homeIcon = req.files.homeIcon[0].location || req.files.homeIcon[0].path;
   }
 
   await home.save();

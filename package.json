@@ -11,6 +11,8 @@
   "author": "dinkar",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1033.0",
+    "@aws-sdk/lib-storage": "^3.1033.0",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
@@ -18,7 +20,8 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.17.0",
     "morgan": "^1.10.1",
-    "multer": "^2.0.2"
+    "multer": "^2.0.2",
+    "multer-s3": "^3.0.1"
   },
   "type": "module"
 }

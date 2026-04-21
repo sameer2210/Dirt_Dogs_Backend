@@ -71,7 +71,7 @@ export const updateCompany = asyncHandler(async (req, res) => {
       await deleteFileFromUploads(company.footerIcon);
     }
 
-    company.footerIcon = req.files.footerIcon[0].path; 
+    company.footerIcon = req.files.footerIcon[0].location || req.files.footerIcon[0].path; 
   }
 
   await company.save();

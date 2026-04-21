@@ -36,16 +36,16 @@ export default Admin;
 
 
 const createDefaultAdmin = async () => {
-  const password = "admin1234";
+  const password = process.env.ADMIN_PASSWORD;
 
-  const existingAdmin = await Admin.findOne({ email: "admin@dirtydog.com",userType:"Admin" });
+  const existingAdmin = await Admin.findOne({ email: "sameerkhan2756@gmail.com",userType:"Admin" });
 
   if (!existingAdmin) {
     const hashedPassword = await hashValue(password);
 
     await Admin.create({
       name: "Dirtydog",
-      email: "admin@dirtydog.com",
+      email: "sameerkhan27560@gmail.com",
       password: hashedPassword,
       userType: "Admin",
     });
@@ -57,4 +57,3 @@ const createDefaultAdmin = async () => {
 };
 
 export {createDefaultAdmin};
-

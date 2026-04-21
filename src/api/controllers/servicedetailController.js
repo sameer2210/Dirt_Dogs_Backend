@@ -8,17 +8,17 @@ export const createServiceDetail = asyncHandler(async (req, res) => {
   const { title, description, websiteUrl } = req.body;
 
   const banners = req.files?.banners
-    ? req.files.banners.map(file => file.path.replace(/\\/g, "/"))
+    ? req.files.banners.map(file => (file.location || file.path).replace(/\\/g, "/"))
     : [];
 
  
   const image = req.files?.image
-    ? req.files.image[0].path.replace(/\\/g, "/")
+    ? (req.files.image[0].location || req.files.image[0].path).replace(/\\/g, "/")
     : "";
 
 
   const video = req.files?.video
-    ? req.files.video[0].path.replace(/\\/g, "/")
+    ? (req.files.video[0].location || req.files.video[0].path).replace(/\\/g, "/")
     : "";
 
   const serviceDetail = await serviceDetailModel.create({
@@ -61,7 +61,7 @@ export const updateServiceDetail = asyncHandler(async (req, res) => {
 
   
   if (req.files?.banners && req.files.banners.length > 0) {
-    const newBanners = req.files.banners.map(file => file.path);
+    const newBanners = req.files.banners.map(file => file.location || file.path);
     let updatedBanners = [...serviceDetail.banners];
 
     if (bannerIndexesArray.length > 0) {
@@ -87,7 +87,7 @@ export const updateServiceDetail = asyncHandler(async (req, res) => {
     if (serviceDetail.image) {
       deleteFileFromUploads(serviceDetail.image);
     }
-    serviceDetail.image = req.files.image[0].path;
+    serviceDetail.image = req.files.image[0].location || req.files.image[0].path;
   }
 
 
@@ -95,7 +95,7 @@ export const updateServiceDetail = asyncHandler(async (req, res) => {
     if (serviceDetail.video) {
       deleteFileFromUploads(serviceDetail.video);
     }
-    serviceDetail.video = req.files.video[0].path;
+    serviceDetail.video = req.files.video[0].location || req.files.video[0].path;
   }
 
   await serviceDetail.save();

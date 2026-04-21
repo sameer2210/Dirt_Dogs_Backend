@@ -10,7 +10,7 @@ export const createService = asyncHandler(async (req, res) => {
 
   // const images = req.files?.image ? req.files.image.map(file => file.path) : [];
   const images = req.files?.image
-  ? req.files.image.map(file => file.path.replace(/\\/g, "/"))
+  ? req.files.image.map(file => (file.location || file.path).replace(/\\/g, "/"))
   : [];
 
 
@@ -48,7 +48,7 @@ export const updateService = asyncHandler(async (req, res) => {
 
  
   if (req.files?.image && req.files.image.length > 0) {
-    const newImages = req.files.image.map(file => file.path);
+    const newImages = req.files.image.map(file => file.location || file.path);
     let updatedImages = [...service.image];
 
     if (imageIndexesArray.length > 0) {

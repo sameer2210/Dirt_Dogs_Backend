@@ -64,7 +64,7 @@ export const updateFinancing = asyncHandler(async (req, res) => {
   }
 
   
-  if (req.file?.path) {
+  if (req.file) {
     if (financing.icon) {
       await deleteFileFromUploads(financing.icon);
     }
