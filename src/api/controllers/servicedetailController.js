@@ -11,7 +11,7 @@ export const createServiceDetail = asyncHandler(async (req, res) => {
     ? req.files.banners.map(file => (file.location || file.path).replace(/\\/g, "/"))
     : [];
 
- 
+
   const image = req.files?.image
     ? (req.files.image[0].location || req.files.image[0].path).replace(/\\/g, "/")
     : "";
@@ -59,7 +59,7 @@ export const updateServiceDetail = asyncHandler(async (req, res) => {
     serviceDetail.websiteUrl = websiteUrl?.trim() || "";
   }
 
-  
+
   if (req.files?.banners && req.files.banners.length > 0) {
     const newBanners = req.files.banners.map(file => file.location || file.path);
     let updatedBanners = [...serviceDetail.banners];
@@ -68,7 +68,7 @@ export const updateServiceDetail = asyncHandler(async (req, res) => {
       bannerIndexesArray.forEach((idx, i) => {
         if (idx >= 0 && idx < updatedBanners.length) {
           if (updatedBanners[idx]) {
-            deleteFileFromUploads(updatedBanners[idx]);
+            await deleteFileFromUploads(updatedBanners[idx]);
           }
           updatedBanners[idx] = newBanners[i];
         } else {
@@ -85,7 +85,7 @@ export const updateServiceDetail = asyncHandler(async (req, res) => {
 
   if (req.files?.image && req.files.image.length > 0) {
     if (serviceDetail.image) {
-      deleteFileFromUploads(serviceDetail.image);
+      await deleteFileFromUploads(serviceDetail.image);
     }
     serviceDetail.image = req.files.image[0].location || req.files.image[0].path;
   }
@@ -93,7 +93,7 @@ export const updateServiceDetail = asyncHandler(async (req, res) => {
 
   if (req.files?.video && req.files.video.length > 0) {
     if (serviceDetail.video) {
-      deleteFileFromUploads(serviceDetail.video);
+      await deleteFileFromUploads(serviceDetail.video);
     }
     serviceDetail.video = req.files.video[0].location || req.files.video[0].path;
   }
@@ -148,12 +148,14 @@ export const deleteServiceDetail = asyncHandler(async (req, res) => {
 
   if (bannerIndexes) {
     const indexes = JSON.parse(bannerIndexes);
+    const deletePromises = [];
     indexes.forEach((idx) => {
       if (serviceDetail.banners[idx]) {
-        deleteFileFromUploads(serviceDetail.banners[idx]);
+        deletePromises.push(deleteFileFromUploads(serviceDetail.banners[idx]));
         serviceDetail.banners.splice(idx, 1);
       }
     });
+    await Promise.all(deletePromises);
 
     await serviceDetail.save();
     return res.status(200).json({
@@ -163,51 +165,18 @@ export const deleteServiceDetail = asyncHandler(async (req, res) => {
     });
   }
 
-  serviceDetail.banners.forEach(img => deleteFileFromUploads(img));
-  if (serviceDetail.image) deleteFileFromUploads(serviceDetail.image);
-  if (serviceDetail.video) deleteFileFromUploads(serviceDetail.video);
+  await Promise.all(serviceDetail.banners.map(img => deleteFileFromUploads(img)));
+  if (serviceDetail.image) await deleteFileFromUploads(serviceDetail.image);
+  if (serviceDetail.video) await deleteFileFromUploads(serviceDetail.video);
 
   await serviceDetail.deleteOne();
 
   res.status(200).json({
     success: true,
-    message: "Service Detail deleted successfully",
+    message: "Service Detail and associated media deleted successfully",
   });
 });
 
-
-
-// export const getServiceDetailByFilter = asyncHandler(async (req, res) => {
-//   const { page = 1, limit = 10, search = "" } = req.query;
-
-//   const query = {};
-
-//   if (search) {
-//     query.$or = [
-//       { title: { $regex: search, $options: "i" } },
-//       { description: { $regex: search, $options: "i" } },
-//     ];
-//   }
-
-
-//   const total = await ServiceDetail.countDocuments(query);
-//   const serviceDetails = await ServiceDetail.find(query)
-//     .sort({ createdAt: -1 })
-//     .skip((page - 1) * limit)
-//     .limit(parseInt(limit));
-
-
-    
-
-//   res.status(200).json({
-//     success: true,
-//     message: "Service Details fetched successfully",
-//     data: serviceDetails,
-//     total,
-//     totalPages: Math.ceil(total / limit),
-//     currentPage: parseInt(page),
-//   });
-// });
 
 export const getServiceDetailByFilter = asyncHandler(async (req, res) => {
   const { page = 1, limit = 10, search = "" } = req.query;

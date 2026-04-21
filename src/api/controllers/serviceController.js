@@ -35,18 +35,18 @@ export const updateService = asyncHandler(async (req, res) => {
     return res.status(400).json({ success: false, message: "serviceId is required" });
   }
 
-  const service = await serviceDetailModel.findById(serviceId);
+  const service = await serviceModel.findById(serviceId);
   if (!service) {
     return res.status(404).json({ success: false, message: "Service not found" });
   }
 
   const imageIndexesArray = imageIndexes ? JSON.parse(imageIndexes) : [];
 
- 
+
   service.title = title ?? service.title;
   service.description = description ?? service.description;
 
- 
+
   if (req.files?.image && req.files.image.length > 0) {
     const newImages = req.files.image.map(file => file.location || file.path);
     let updatedImages = [...service.image];
@@ -55,8 +55,8 @@ export const updateService = asyncHandler(async (req, res) => {
       imageIndexesArray.forEach((idx, i) => {
         if (idx >= 0 && idx < updatedImages.length) {
           if (updatedImages[idx]) {
-           
-            deleteFileFromUploads(updatedImages[idx]);
+
+            await deleteFileFromUploads(updatedImages[idx]);
           }
           updatedImages[idx] = newImages[i];
         } else {
@@ -117,12 +117,14 @@ export const deleteService = asyncHandler(async (req, res) => {
 
   if (imageIndexes) {
     const indexes = JSON.parse(imageIndexes);
+    const deletePromises = [];
     indexes.forEach((idx) => {
       if (service.image[idx]) {
-        deleteFileFromUploads(service.image[idx]);
+        deletePromises.push(deleteFileFromUploads(service.image[idx]));
         service.image.splice(idx, 1);
       }
     });
+    await Promise.all(deletePromises);
 
     await service.save();
     return res.status(200).json({
@@ -132,44 +134,14 @@ export const deleteService = asyncHandler(async (req, res) => {
     });
   }
 
-  service.image.forEach(img => deleteFileFromUploads(img));
+  await Promise.all(service.image.map(img => deleteFileFromUploads(img)));
   await service.deleteOne();
 
   res.status(200).json({
     success: true,
-    message: "Service deleted successfully",
+    message: "Service and associated images deleted successfully",
   });
 });
-
-
-
-// export const getServiceByFilter = asyncHandler(async (req, res) => {
-//   const { page = 1, limit = 10, search = "" } = req.query;
-
-//   const query = {};
-
-//   if (search) {
-//     query.$or = [
-//       { title: { $regex: search, $options: "i" } },
-//       { description: { $regex: search, $options: "i" } },
-//     ];
-//   }
-
-//   const total = await Service.countDocuments(query);
-//   const services = await Service.find(query)
-//     .sort({ createdAt: -1 })
-//     .skip((page - 1) * limit)
-//     .limit(parseInt(limit));
-
-//   res.status(200).json({
-//     success: true,
-//     message: "Services fetched successfully",
-//     data: services,
-//     total,
-//     totalPages: Math.ceil(total / limit),
-//     currentPage: parseInt(page),
-//   });
-// });
 
 
 export const getServiceByFilter = asyncHandler(async (req, res) => {
@@ -194,7 +166,7 @@ export const getServiceByFilter = asyncHandler(async (req, res) => {
 
   service._doc.serviceDetailModel=servicedetail
 
-  
+
   service.image = service.image.map((img) => img.replace(/\\/g, "/"));
 
   res.status(200).json({
@@ -203,5 +175,3 @@ export const getServiceByFilter = asyncHandler(async (req, res) => {
     data: service,
   });
 });
-
-

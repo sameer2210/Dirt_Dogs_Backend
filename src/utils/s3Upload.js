@@ -34,11 +34,11 @@ export const uploadToS3 = async (fileBuffer, fileName, mimeType) => {
       params: params
     });
     const result = await upload.done();
-    console.log(`✅ File uploaded to S3: ${result.Location}`);
+    console.log(`File uploaded to S3: ${result.Location}`);
 
     return result.Location; // Full S3 URL
   } catch (error) {
-    console.error('❌ Error uploading to S3:', error.message);
+    console.error('Error uploading to S3:', error.message);
     throw new Error(`S3 upload failed: ${error.message}`);
   }
 };
@@ -59,15 +59,18 @@ export const deleteFromS3 = async fileUrl => {
       key = fileUrl.split('.com/').pop();
     }
 
+    // Decode the URL in case the file name contained spaces or special characters
+    key = decodeURIComponent(key);
+
     const params = {
       Bucket: AWS_BUCKET_NAME,
       Key: key,
     };
 
     await s3.send(new DeleteObjectCommand(params));
-    console.log(`✅ File deleted from S3: ${key}`);
+    console.log(`File deleted from S3: ${key}`);
   } catch (error) {
-    console.error('❌ Error deleting from S3:', error.message);
+    console.error('Error deleting from S3:', error.message);
     // Don't throw error on delete, just log it
   }
 };
@@ -87,7 +90,7 @@ export const getFromS3 = async key => {
     const data = await s3.send(new GetObjectCommand(params));
     return data.Body;
   } catch (error) {
-    console.error('❌ Error getting file from S3:', error.message);
+    console.error('Error getting file from S3:', error.message);
     throw new Error(`Failed to get file from S3: ${error.message}`);
   }
 };
@@ -106,7 +109,7 @@ export const listS3Files = async () => {
     const data = await s3.send(new ListObjectsV2Command(params));
     return data.Contents || [];
   } catch (error) {
-    console.error('❌ Error listing S3 files:', error.message);
+    console.error('Error listing S3 files:', error.message);
     throw error;
   }
 };

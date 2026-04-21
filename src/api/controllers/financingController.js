@@ -154,7 +154,7 @@ export const deleteFinancing = asyncHandler(async (req, res) => {
     .status(200)
     .json({
          success: true,
-          message: "Financing deleted successfully",
+          message: "Financing and associated icon deleted successfully",
           data:financing
          });
 });
