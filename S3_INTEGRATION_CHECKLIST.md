@@ -1,146 +1,75 @@
-# S3 Integration - Quick Start Checklist
+# S3 Integration Checklist (Current Project)
 
-## ✅ Completed Backend Setup
+Last verified: April 27, 2026
 
-- [x] Installed AWS SDK and multer-s3
-- [x] Created S3 configuration file (`src/config/s3.js`)
-- [x] Created S3 utilities (`src/utils/s3Upload.js`)
-- [x] Updated multer middleware for S3 uploads
-- [x] Updated app.js to test S3 connection
-- [x] Updated normalizePath utility to handle S3 URLs
-- [x] Added AWS environment variables template to .env
+## 1. Backend Code Status
 
-## 🔧 To Complete - Action Items
+- [x] `src/config/s3.js` exists and initializes `S3Client`
+- [x] `src/api/middleware/multer.js` uses `multer-s3`
+- [x] `src/utils/s3Upload.js` supports upload/delete/get/list
+- [x] `src/utils/normalizePath.js` supports S3 URL path normalization
+- [x] Startup S3 test is called from `src/app.js`
 
-### Step 1: AWS Account Setup (5-10 minutes)
+## 2. Fixed Error Status
 
-- [ ] Create AWS account if not already done
-- [ ] Create S3 bucket following `AWS_S3_SETUP.md`
-- [ ] Configure bucket policy for public read access
-- [ ] Create IAM user with S3 access
-- [ ] Generate and save Access Key and Secret Key
+- [x] Fixed `SyntaxError: Unexpected reserved word`
+- [x] Replaced invalid `await` in `forEach` with async-safe loops
+- [x] Fixed files:
+  - `src/api/controllers/serviceController.js`
+  - `src/api/controllers/servicedetailController.js`
 
-### Step 2: Configure Backend (2 minutes)
+## 3. AWS Account/IAM/Bucket
 
-- [ ] Update `.env` with your AWS credentials:
-  ```
-  AWS_ACCESS_KEY_ID=your_key_here
-  AWS_SECRET_ACCESS_KEY=your_secret_here
-  AWS_REGION=us-east-1
-  AWS_S3_BUCKET_NAME=your_bucket_name
-  ```
+- [ ] Bucket created in target region
+- [ ] `.env` has correct `AWS_S3_BUCKET_NAME`
+- [ ] IAM key is active
+- [ ] IAM policy allows:
+  - `s3:PutObject`
+  - `s3:GetObject`
+  - `s3:DeleteObject`
+  - `s3:ListBucket`
+  - `s3:ListAllMyBuckets` (required by current startup test)
+- [ ] Public-read strategy confirmed for media URLs (or private strategy intentionally implemented)
 
-### Step 3: Update Frontend (if needed)
+## 4. Environment Variables
 
-- [ ] Frontend already supports S3 URLs (no changes needed)
-- [ ] If using custom image serving, update endpoints
+- [ ] `AWS_ACCESS_KEY_ID` set
+- [ ] `AWS_SECRET_ACCESS_KEY` set
+- [ ] `AWS_REGION` set
+- [ ] `AWS_S3_BUCKET_NAME` set
 
-### Step 4: Test the Integration
+## 5. Runtime Verification
 
-- [ ] Start backend: `npm start`
-- [ ] Check console for "✅ S3 connection successful"
-- [ ] Upload an image via admin panel
-- [ ] Verify image appears with S3 URL
-- [ ] Verify image displays correctly on page
+- [ ] Run:
+  - `node --check src/api/controllers/serviceController.js`
+  - `node --check src/api/controllers/servicedetailController.js`
+  - `npm start`
+- [ ] Confirm log: `S3 connection successful`
+- [ ] Upload from admin route succeeds
+- [ ] DB saves S3 URL (`https://...amazonaws.com/uploads/...`)
+- [ ] Delete/replace action removes old S3 object
 
-### Step 5: Test Delete Function
+## 6. Current Upload/Delete Flow
 
-- [ ] Delete an image from admin
-- [ ] Verify it's removed from S3 and database
+- [x] Client sends multipart form-data
+- [x] Route middleware `upload.single/fields` handles upload
+- [x] `multer-s3` stores object in `uploads/` key prefix
+- [x] Controller stores `file.location` URL in DB
+- [x] On update/delete, controller calls `deleteFileFromUploads`
+- [x] Helper extracts key from URL and deletes from S3
 
-## 📊 What Changed
+## 7. Route Reality Check
 
-### Backend
+- [x] Service upload route: `POST /api/admin/createService`
+- [x] Service update route: `PUT /api/admin/updateService`
+- [x] Service detail upload route: `POST /api/admin/createServiceDetail`
+- [x] Service detail update route: `PUT /api/admin/updateServiceDetail`
+- [x] Home update upload route: `PUT /api/admin/updateHomePage`
+- [x] Admin profile upload route: `PUT /api/admin/updateAdminProfile`
+- [x] No `/api/test-s3` route currently exists
 
-| File                           | Change                                       |
-| ------------------------------ | -------------------------------------------- |
-| `src/api/middleware/multer.js` | Now uses multer-s3, S3 delete function       |
-| `src/app.js`                   | Removed local uploads serving, added S3 test |
-| `src/config/s3.js`             | NEW - S3 client config                       |
-| `src/utils/s3Upload.js`        | NEW - S3 operations                          |
-| `src/utils/normalizePath.js`   | Updated to handle S3 URLs                    |
-| `.env`                         | Added AWS credentials                        |
+## 8. Optional Cleanup
 
-### Frontend
-
-| File                       | Change                                 |
-| -------------------------- | -------------------------------------- |
-| `src/utils/getImageUrl.js` | Updated comments (already supports S3) |
-
-## 🔄 File Upload Flow (Now)
-
-```
-1. User uploads file via form
-   ↓
-2. Multer-S3 intercepts multipart data
-   ↓
-3. File uploaded directly to AWS S3
-   ↓
-4. S3 returns public URL (e.g., https://bucket.s3.amazonaws.com/uploads/...)
-   ↓
-5. Controller receives S3 URL in req.files[x].location
-   ↓
-6. S3 URL saved to MongoDB
-   ↓
-7. Frontend fetches data, displays image via getImageUrl() utility
-```
-
-## 🧹 Cleanup
-
-You can now safely:
-
-- [ ] Delete the `/uploads` folder (or keep for backup)
-- [ ] Remove local file serving from server.js (already done)
-- [ ] Update any CI/CD pipelines that reference local uploads
-
-## 🐛 Debugging
-
-If uploads fail:
-
-1. Check `.env` has all AWS credentials
-2. Run: `curl -X POST http://localhost:3000/api/test-s3` (if implemented)
-3. Check browser console for network errors
-4. Check server logs for S3 errors
-5. Verify bucket policy allows public read
-
-## 📝 Environment Template
-
-Copy this to your `.env`:
-
-```env
-# AWS S3 Configuration
-AWS_ACCESS_KEY_ID=your_access_key_here
-AWS_SECRET_ACCESS_KEY=your_secret_key_here
-AWS_REGION=us-east-1
-AWS_S3_BUCKET_NAME=dirt-dogs-bucket
-```
-
-## 🚀 Performance Tips
-
-1. Consider using CloudFront CDN for faster delivery
-2. Set appropriate cache headers in S3
-3. Compress images before upload
-4. Use S3 lifecycle policies for old file cleanup
-5. Monitor usage in CloudWatch
-
-## ✨ Features Available
-
-✅ Upload images and videos to S3
-✅ Automatic S3 connection test on server start
-✅ Delete images from S3 when record is deleted
-✅ Public URL generation for display
-✅ Support for multiple file types
-✅ 50MB file size limit
-✅ Automatic file naming with timestamps
-
-## 📚 More Info
-
-See `AWS_S3_SETUP.md` for:
-
-- Detailed setup instructions
-- AWS Console walkthrough
-- Bucket policy configuration
-- CORS setup
-- Troubleshooting guide
-- Cost considerations
-- Security best practices
+- [ ] Keep/remove local `Backend/uploads` based on migration plan
+- [ ] Remove old local-upload assumptions from legacy docs/comments
+- [ ] Add CloudFront and lifecycle rules if needed

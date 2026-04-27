@@ -52,17 +52,16 @@ export const updateService = asyncHandler(async (req, res) => {
     let updatedImages = [...service.image];
 
     if (imageIndexesArray.length > 0) {
-      imageIndexesArray.forEach((idx, i) => {
+      for (const [i, idx] of imageIndexesArray.entries()) {
         if (idx >= 0 && idx < updatedImages.length) {
           if (updatedImages[idx]) {
-
             await deleteFileFromUploads(updatedImages[idx]);
           }
           updatedImages[idx] = newImages[i];
         } else {
           updatedImages.push(newImages[i]);
         }
-      });
+      }
     } else {
       updatedImages = [...updatedImages, ...newImages];
     }

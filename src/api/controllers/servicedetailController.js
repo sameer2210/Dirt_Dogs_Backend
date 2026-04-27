@@ -65,7 +65,7 @@ export const updateServiceDetail = asyncHandler(async (req, res) => {
     let updatedBanners = [...serviceDetail.banners];
 
     if (bannerIndexesArray.length > 0) {
-      bannerIndexesArray.forEach((idx, i) => {
+      for (const [i, idx] of bannerIndexesArray.entries()) {
         if (idx >= 0 && idx < updatedBanners.length) {
           if (updatedBanners[idx]) {
             await deleteFileFromUploads(updatedBanners[idx]);
@@ -74,7 +74,7 @@ export const updateServiceDetail = asyncHandler(async (req, res) => {
         } else {
           updatedBanners.push(newBanners[i]);
         }
-      });
+      }
     } else {
       updatedBanners = [...updatedBanners, ...newBanners];
     }
