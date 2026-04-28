@@ -13,10 +13,10 @@ const databaseConnection = async()=>{
   
     console.log("Database Connected")
 
-    createDefaultAdmin();
-    createDefaultHome();
-    createDefaultAbout();
-    createDefaultCompany();
+    await createDefaultAdmin();
+    await createDefaultHome();
+    await createDefaultAbout();
+    await createDefaultCompany();
     
 })
 .catch((error)=>console.log(error.message));

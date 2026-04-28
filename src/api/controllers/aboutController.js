@@ -1,5 +1,6 @@
 import asyncHandler from "../../utils/asyncHandler.js";
 import aboutModel from "../../models/aboutModel.js";
+import adminModel from "../../models/adminModel.js";
 import { deleteFileFromUploads } from "../middleware/multer.js";
 import { normalizePath } from "../../utils/normalizePath.js";
 
@@ -16,10 +17,28 @@ export const getAbout = asyncHandler(async (req, res) => {
     });
   }
   
+  const aboutData = about.toObject();
+  const hasOwnerImage = Boolean(aboutData?.ownerInfo?.image);
+
+  // Fallback: expose admin profile image on About page when owner image is empty
+  if (!hasOwnerImage) {
+    const admin = await adminModel
+      .findOne({ userType: "Admin" })
+      .sort({ createdAt: 1 })
+      .select("image");
+
+    if (admin?.image) {
+      aboutData.ownerInfo = {
+        ...(aboutData.ownerInfo || {}),
+        image: admin.image,
+      };
+    }
+  }
+
   res.status(200).json({
     success: true,
     message: "About content retrieved successfully",
-    data: about,
+    data: aboutData,
   });
 });
 

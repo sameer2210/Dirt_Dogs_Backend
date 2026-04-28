@@ -2,6 +2,8 @@ import adminModel from "../../models/adminModel.js"
 import  jwt from "jsonwebtoken";
 import { compareValue, hashValue } from "../../utils/hashValue.js";
 import asyncHandler from "../../utils/asyncHandler.js";
+import aboutModel from "../../models/aboutModel.js";
+import { deleteFileFromUploads } from "../middleware/multer.js";
 
 export const adminLogin = asyncHandler(async(req,res)=>{
 
@@ -53,9 +55,30 @@ export const updateAdminProfile = asyncHandler(async(req,res)=>{
 
     if (name) admin.name = name;
     if (password) admin.password = await hashValue(password);
-    if (image) admin.image = image;
+
+    if (image) {
+      const previousImage = admin.image;
+      admin.image = image;
+
+      // Delete old image from S3 only after replacing with a new one
+      if (previousImage && previousImage !== image) {
+        await deleteFileFromUploads(previousImage);
+      }
+    }
 
     await admin.save();
+
+    // Keep About owner image in sync with admin profile image
+    if (image) {
+      const about = await aboutModel.findOne();
+      if (about) {
+        about.ownerInfo = {
+          ...(about.ownerInfo || {}),
+          image: admin.image,
+        };
+        await about.save();
+      }
+    }
 
     res.status(200).json({
       success: true,

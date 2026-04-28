@@ -37,15 +37,25 @@ export default Admin;
 
 const createDefaultAdmin = async () => {
   const password = process.env.ADMIN_PASSWORD;
+  const defaultAdminEmail = (process.env.ADMIN_EMAIL || "sameerkhan27560@gmail.com").toLowerCase().trim();
 
-  const existingAdmin = await Admin.findOne({ email: "sameerkhan2756@gmail.com",userType:"Admin" });
+  if (!password) {
+    console.warn("ADMIN_PASSWORD is missing; skipping default admin creation.");
+    return;
+  }
+
+  // Idempotent check: if any admin exists with configured default email, don't create again
+  const existingAdmin = await Admin.findOne({
+    email: defaultAdminEmail,
+    userType: "Admin",
+  });
 
   if (!existingAdmin) {
     const hashedPassword = await hashValue(password);
 
     await Admin.create({
       name: "Dirtydog",
-      email: "sameerkhan27560@gmail.com",
+      email: defaultAdminEmail,
       password: hashedPassword,
       userType: "Admin",
     });
