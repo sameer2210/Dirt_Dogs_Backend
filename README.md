@@ -683,16 +683,17 @@ VITE_API_URL=            # Base URL used by getImageUrl utility (default: http:/
 ## 📸 Screenshots
 
 ### Home
-![Home](./screenshots/home.png)
+![Home](/Backend/uploads/home.png)
 
 ### Services
-![Services](./screenshots/services.png)
+![Services](/Backend/uploads/nav.png)
+
+### Admin Details
+![Service Details](/Backend/uploads/admin.png)
 
 ### Service Details
-![Service Details](./screenshots/service-details.png)
+![Service Details](/Backend/uploads/1754070732741-vidS.mp4)
 
-### About
-![About](./screenshots/about.png)
 
 ---
 
